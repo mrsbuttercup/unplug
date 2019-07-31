@@ -132,10 +132,8 @@ final class Bot
      */
     private function getTemplate(array $templateVars = array()): string
     {
-        $loader = new FilesystemLoader('Resources/views');
-        $twig   = new Environment($loader, array(
-            'cache' => '../var/cache',
-        ));
+        $loader = new FilesystemLoader(__DIR__.'/Resources/views');
+        $twig   = new Environment($loader);
 
         return $twig->render('shaming-list.html.twig', $templateVars);
     }
