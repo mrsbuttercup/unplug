@@ -64,7 +64,7 @@ final class Bot
         $this->message = $input->edited_message ?? $input->message;
 
         /** @var Chat $chat */
-        $this->chat = $message->chat;
+        $this->chat = $this->message->chat;
 
         $this->apiKey = (new ParametersBag)->get('telegram_api_key');
     }
