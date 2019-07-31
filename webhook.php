@@ -19,9 +19,10 @@ $setWebhook->allowed_updates = array(
     'channel_post'
 );
 
+$apiKey  = (new ParametersBag)->get('telegram_api_key');
 $loop    = Factory::create();
 $handler = new HttpClientRequestHandler($loop);
-$tgLog   = new TgLog($this->apiKey, $handler);
+$tgLog   = new TgLog($apiKey, $handler);
 
 $tgLog->performApiRequest($setWebhook)
     ->then(function($response) {
