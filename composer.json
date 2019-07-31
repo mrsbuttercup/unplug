@@ -1,0 +1,55 @@
+{
+  "name": "mrsbuttercup/unplug",
+  "description": "Unplug stuff",
+  "keywords": [
+    "Telegram",
+    "Telegram Bot",
+    "Unplug"
+  ],
+  "type": "project",
+  "authors": [
+    {
+      "name": "Mary De Nóbrega",
+      "email": "denobrega.mary@gmail.com",
+      "homepage": "https://marydenobrega.com",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "TelegramBot\\": "src/"
+    },
+    "classmap": [
+      "src/"
+    ]
+  },
+  "require": {
+    "php": ">=7.1",
+    "ext-json": "*",
+    "unreal4u/telegram-api": "~3.4",
+    "incenteev/composer-parameter-handler": "^2.1",
+    "symfony/yaml": "^3.3",
+    "twig/twig": "^2.0"
+  },
+  "config": {
+    "apcu-autoloader": true,
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "7.1"
+    },
+    "process-timeout": 600
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+    ],
+    "post-update-cmd": [
+      "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+    ]
+  },
+  "extra": {
+    "incenteev-parameters": {
+      "file": "app/config/parameters.yml"
+    }
+  }
+}
