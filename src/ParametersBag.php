@@ -21,8 +21,10 @@ final class ParametersBag
      */
     public function __construct()
     {
-        $configFile       = file_get_contents('app/config/parameters.yml');
-        $this->parameters = Yaml::parse($configFile);
+        $configFile = file_get_contents('app/config/parameters.yml');
+        $parameters = Yaml::parse($configFile);
+
+        $this->parameters = $parameters['parameters'];
     }
 
     /**
