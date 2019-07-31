@@ -1,8 +1,9 @@
 <?php
 
-
 namespace TelegramBot;
 
+use React\EventLoop\Factory;
+use React\Promise\PromiseInterface;
 use unreal4u\TelegramAPI\{
     HttpClientRequestHandler,
     TgLog,
@@ -10,16 +11,14 @@ use unreal4u\TelegramAPI\{
 };
 use unreal4u\TelegramAPI\Telegram\Methods\{
     GetChatMembersCount,
-    SendMessage
+    SendMessage,
+    SetWebhook
 };
 use unreal4u\TelegramAPI\Telegram\Types\{
     Chat,
     Message,
     Update
 };
-use React\EventLoop\Factory;
-use React\Promise\Promise;
-use React\Promise\PromiseInterface;
 use Twig\{
     Loader\FilesystemLoader,
     Environment
@@ -131,7 +130,7 @@ final class Bot
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function getTemplate(array $templateVars = array()): string
+    private function getTemplate(array $templateVars = array()): string
     {
         $loader = new FilesystemLoader('Resources/views');
         $twig   = new Environment($loader, array(
