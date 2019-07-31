@@ -3,7 +3,6 @@
 require_once 'vendor/autoload.php';
 
 use TelegramBot\Bot;
-use function json_decode;
 
 /**
  * We receive a JSON-serialized Update {@see https://core.telegram.org/bots/api#update}

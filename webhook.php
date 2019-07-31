@@ -26,11 +26,11 @@ $tgLog   = new TgLog($apiKey, $handler);
 
 $tgLog->performApiRequest($setWebhook)
     ->then(function($response) {
-        echo 'Webhook successful set';
-        var_dump($response);
+        $result = $response->data;
+        echo sprintf('Webhook result %s', $result);
     }, function($response) {
-        echo 'There was an error';
-        var_dump($response);
+        $result = $response->data;
+        echo sprintf('Webhook result %s', $result);
     });
 
 $loop->run();
