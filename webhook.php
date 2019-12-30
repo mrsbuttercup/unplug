@@ -3,15 +3,18 @@
 require_once 'vendor/autoload.php';
 
 use React\EventLoop\Factory;
-use TelegramBot\ParametersBag;
 use unreal4u\TelegramAPI\{
     HttpClientRequestHandler,
     Telegram\Methods\SetWebhook,
     TgLog
 };
+use Symfony\Component\Dotenv\Dotenv;
+
+$dotenv = new Dotenv();
+$dotenv->load(__DIR__.'/.env');
 
 $setWebhook      = new SetWebhook;
-$setWebhook->url = (new ParametersBag)->get('webhook_url');
+$setWebhook->url = $_ENV['WEBHOOK_URL'];
 $setWebhook->allowed_updates = array(
     'message',
     'edited_message',
@@ -19,10 +22,9 @@ $setWebhook->allowed_updates = array(
     'channel_post'
 );
 
-$apiKey  = (new ParametersBag)->get('telegram_api_key');
 $loop    = Factory::create();
 $handler = new HttpClientRequestHandler($loop);
-$tgLog   = new TgLog($apiKey, $handler);
+$tgLog   = new TgLog($_ENV['TELEGRAM_API_KEY'], $handler);
 
 $tgLog->performApiRequest($setWebhook)
     ->then(function($response) {

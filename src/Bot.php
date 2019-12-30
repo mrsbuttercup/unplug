@@ -50,13 +50,13 @@ final class Bot
      * @var string
      */
     private $apiKey;
-
-    /**
-     * Bot constructor.
-     *
-     * @param $input
-     */
-    public function __construct($input)
+    
+    public function __construct(string $telegramApiKey)
+    {
+        $this->apiKey = $telegramApiKey;
+    }
+    
+    public function loadInput($input): self
     {
         $this->input = $input = new Update($input);
 
@@ -65,14 +65,11 @@ final class Bot
 
         /** @var Chat $chat */
         $this->chat = $this->message->chat;
-
-        $this->apiKey = (new ParametersBag)->get('telegram_api_key');
+        
+        return $this;
     }
-
-    /**
-     * @return PromiseInterface|null
-     */
-    public function sendAnswer()
+    
+    public function sendAnswer(): ?PromiseInterface
     {
         $isValid = $this->isValid();
         if (!$isValid) {
@@ -123,9 +120,6 @@ final class Bot
     }
 
     /**
-     * @param array $templateVars
-     *
-     * @return string
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
@@ -137,10 +131,7 @@ final class Bot
 
         return $twig->render('shaming-list.html.twig', $templateVars);
     }
-
-    /**
-     * @return bool
-     */
+    
     private function isValid(): bool
     {
         if (!in_array($this->chat->type, array('group', 'supergroup'), true)) {

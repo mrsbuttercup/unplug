@@ -3,6 +3,10 @@
 require_once 'vendor/autoload.php';
 
 use TelegramBot\Bot;
+use Symfony\Component\Dotenv\Dotenv;
+
+$dotenv = new Dotenv();
+$dotenv->load(__DIR__.'/.env');
 
 /**
  * We receive a JSON-serialized Update {@see https://core.telegram.org/bots/api#update}
@@ -15,8 +19,9 @@ $update = file_get_contents('php://input');
 $input  = json_decode($update, true);
 
 try {
-    $bot = new Bot($input);
-    $bot->sendAnswer();
+    $bot = new Bot($_ENV['TELEGRAM_API_KEY']);
+    $bot->loadInput($input)
+        ->sendAnswer();
 } catch (\Throwable $e) {
     // Log maybe?
 }
