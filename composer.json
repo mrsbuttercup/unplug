@@ -1,5 +1,20 @@
 {
+    "name": "mrsbuttercup/unplug",
+    "description": "Unplug stuff",
+    "keywords": [
+        "Telegram",
+        "Telegram Bot",
+        "Unplug"
+    ],
     "type": "project",
+    "authors": [
+        {
+            "name": "Mary De Nóbrega",
+            "email": "denobrega.mary@gmail.com",
+            "homepage": "https://marydenobrega.com",
+            "role": "Developer"
+        }
+    ],
     "license": "proprietary",
     "require": {
         "php": "^7.4.2",
