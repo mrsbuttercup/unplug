@@ -2,13 +2,13 @@
 
 current-dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-# 👌 Main targets
+# Main targets
 
 build: deps start
 
 deps: composer-install
 
-# 🐘 Composer
+# Composer
 
 composer-install: CMD=install
 composer-update: CMD=update
@@ -21,7 +21,7 @@ composer composer-install composer-update:
 			--no-ansi \
 			--no-interaction
 
-# 🕵️ Clear cache
+# Clear cache
 # OpCache: Restarts the unique process running in the PHP FPM container
 # Nginx: Reloads the server
 
@@ -32,13 +32,13 @@ reload:
 # Tests
 
 test:
-	@docker exec unplug-php make run-tests
+	@docker exec -it unplug-php make run-tests
 
 run-tests:
 	mkdir -p build/test_results/phpunit
 	./bin/phpunit --exclude-group='disabled' --log-junit build/test_results/phpunit/junit.xml tests
 
-# 🐳 Docker Compose
+# Docker Compose
 
 start:
 	@docker-compose up -d
