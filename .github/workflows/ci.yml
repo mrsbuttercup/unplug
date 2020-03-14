@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - name: GIT Checkout
+        uses: actions/checkout@v1
 
       - name: Install dependencies
         run: make composer-install
@@ -20,4 +21,10 @@ jobs:
       - name: Start all the environment
         run: make start
 
-      - uses: php-actions/phpunit@v1
+      - run: mkdir -p build/test_results/phpunit
+
+      - name: Run the tests
+        uses: php-actions/phpunit@v1
+        with:
+          junit: build/test_results/phpunit/junit.xml
+          config: phpunit.xml.dist
