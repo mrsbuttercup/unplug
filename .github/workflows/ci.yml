@@ -21,7 +21,8 @@ jobs:
       - name: Start all the environment
         run: make start
 
-      - run: mkdir -p build/test_results/phpunit
+      - name: Creating testing results directory
+        run: mkdir -p build/test_results/phpunit
 
       - name: Run the tests
         uses: php-actions/phpunit@v1
