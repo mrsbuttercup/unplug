@@ -36,7 +36,7 @@ test:
 
 run-tests:
 	mkdir -p build/test_results/phpunit
-	./bin/phpunit --exclude-group='disabled' --log-junit build/test_results/phpunit/junit.xml tests
+	./vendor/bin/phpunit --exclude-group='disabled' --log-junit build/test_results/phpunit/junit.xml tests
 
 # Docker Compose
 
