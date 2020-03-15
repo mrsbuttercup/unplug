@@ -15,7 +15,9 @@ composer-update: CMD=update
 
 # Usage example (add a new dependency): `make composer CMD="require --dev symfony/var-dumper ^4.2"`
 composer composer-install composer-update:
-	@docker run --rm --volume $(current-dir):/app --user $(id -u):$(id -g) \
+	@docker run --rm --interactive --user $(id -u):$(id -g) \
+		--volume $(current-dir):/app \
+		--volume ${COMPOSER_HOME:-$HOME/.composer}:/tmp \
 		composer $(CMD) \
 			--ignore-platform-reqs \
 			--no-ansi \
@@ -30,26 +32,21 @@ reload:
 	@docker-compose exec nginx nginx -s reload
 
 # Tests
-
 test:
 	@docker exec unplug-php make run-tests
 
 run-tests:
 	mkdir -p build/test_results/phpunit
-	./vendor/bin/phpunit --exclude-group='disabled' --log-junit build/test_results/phpunit/junit.xml tests
+	./vendor/bin/phpunit --exclude-group='disabled' --colors=always --log-junit build/test_results/phpunit/junit.xml tests
 
 # Docker Compose
-
-start:
-	@docker-compose up -d
-
+start: CMD=up -d
 stop: CMD=stop
-
 destroy: CMD=down
 
 # Usage: `make doco CMD="ps --services"`
 # Usage: `make doco CMD="build --parallel --pull --force-rm --no-cache"`
-doco stop destroy:
+doco start stop destroy:
 	@docker-compose $(CMD)
 
 rebuild:
