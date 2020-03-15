@@ -3,13 +3,11 @@
 current-dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 # Main targets
-
 build: deps start
 
 deps: composer-install
 
 # Composer
-
 composer-install: CMD=install
 composer-update: CMD=update
 
@@ -26,7 +24,6 @@ composer composer-install composer-update:
 # Clear cache
 # OpCache: Restarts the unique process running in the PHP FPM container
 # Nginx: Reloads the server
-
 reload:
 	@docker-compose exec php kill -USR2 1
 	@docker-compose exec nginx nginx -s reload
