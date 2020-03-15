@@ -32,7 +32,7 @@ reload:
 # Tests
 
 test:
-	@docker exec -it unplug-php make run-tests
+	@docker exec unplug-php make run-tests
 
 run-tests:
 	mkdir -p build/test_results/phpunit
