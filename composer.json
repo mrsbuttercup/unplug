@@ -1,5 +1,20 @@
 {
+    "name": "mrsbuttercup/unplug",
+    "description": "Unplug stuff",
+    "keywords": [
+        "Telegram",
+        "Telegram Bot",
+        "Unplug"
+    ],
     "type": "project",
+    "authors": [
+        {
+            "name": "Mary De Nóbrega",
+            "email": "denobrega.mary@gmail.com",
+            "homepage": "https://marydenobrega.com",
+            "role": "Developer"
+        }
+    ],
     "license": "proprietary",
     "require": {
         "php": "^7.4.2",
@@ -20,7 +35,7 @@
         "symfony/yaml": "5.0.*"
     },
     "require-dev": {
-        "symfony/test-pack": "^1.0"
+        "phpunit/phpunit": "^9.0"
     },
     "config": {
         "preferred-install": {

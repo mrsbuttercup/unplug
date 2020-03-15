@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: GIT Checkout
+        uses: actions/checkout@v1
+
+      - name: Setting cache volume for Composer
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: make deps
+
+      - name: Start all the environment
+        run: make start
+
+      - name: Run the tests
+        run: make test
