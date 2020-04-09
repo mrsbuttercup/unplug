@@ -71,35 +71,29 @@ final class Bot
      */
     public function cleanPendingUpdates(int $maxAttempts = 3): void
     {
-        try {
-            $webhookInfo = $this->getWebhookInfo();
-            $attemptsCounter = 0;
+        $webhookInfo = $this->getWebhookInfo();
+        $attemptsCounter = 0;
 
-            $currentWebhookUrl = $webhookInfo->url;
+        $currentWebhookUrl = $webhookInfo->url;
 
-            // we need to disable webhook url before getting updates...
-            $this->removeWebhook();
+        // we need to disable webhook url before getting updates...
+        $this->removeWebhook();
 
-            while ($webhookInfo->pendingUpdateCount > 0 && $attemptsCounter < $maxAttempts) {
-                $lastUpdate = $this->getLastUpdate();
-                if ($lastUpdate) {
-                    $biggerOffset = $lastUpdate->updateId + 1;
+        while ($webhookInfo->pendingUpdateCount > 0 && $attemptsCounter < $maxAttempts) {
+            $lastUpdate = $this->getLastUpdate();
+            if ($lastUpdate) {
+                $biggerOffset = $lastUpdate->updateId + 1;
 
-                    $this->telegramAPI->makeRequest(new GetUpdates(1, $biggerOffset));
-                }
-
-                $webhookInfo = $this->getWebhookInfo();
-
-                $maxAttempts++;
+                $this->telegramAPI->makeRequest(new GetUpdates(1, $biggerOffset));
             }
 
-            // Restore webhook url
-            $this->setWebhook($currentWebhookUrl);
+            $webhookInfo = $this->getWebhookInfo();
 
-        } catch (\Exception $exception) {
-            dump($exception);
-            exit;
+            $maxAttempts++;
         }
+
+        // Restore webhook url
+        $this->setWebhook($currentWebhookUrl);
     }
 
     public function getUpdates(): array
@@ -170,6 +164,10 @@ final class Bot
     private function isValid(Update $update): bool
     {
         $message = $update->editedMessage ?? $update->message;
+        if (!$message->text) {
+            return false;
+        }
+
         if (!\in_array($message->chat->type, array('group', 'supergroup'), true)) {
             return false;
         }
