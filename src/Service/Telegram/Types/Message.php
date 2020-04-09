@@ -10,7 +10,7 @@ final class Message extends TelegramTypes implements \JsonSerializable
     public User $from;
     public \DateTimeInterface $date;
     public Chat $chat;
-    public ?string $text;
+    public ?string $text = null;
 
     public function jsonSerialize()
     {
