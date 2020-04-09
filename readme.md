@@ -9,7 +9,7 @@
 
 ## Unplug Bot
 
-Bot for unplug. This bot sends an answer to a Telegram channel with a predefined template.
+Bot for unplug. This bot sends an sendAnswer to a Telegram channel with a predefined template.
 
 ## Environment setup
 

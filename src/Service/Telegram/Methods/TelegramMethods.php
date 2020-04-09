@@ -6,6 +6,8 @@ namespace App\Service\Telegram\Methods;
 
 abstract class TelegramMethods
 {
+    abstract public function getMethod(): string;
+
     public function getUri(): string
     {
         $reflectionClass = new \ReflectionClass($this);

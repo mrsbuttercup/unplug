@@ -6,6 +6,13 @@ namespace App\Service\Telegram\Methods;
 
 final class GetWebhookInfo extends TelegramMethods implements \JsonSerializable
 {
+    private const METHOD = 'GET';
+
+    public function getMethod(): string
+    {
+        return self::METHOD;
+    }
+
     public function jsonSerialize()
     {
         return [];

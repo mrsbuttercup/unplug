@@ -6,7 +6,6 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -16,10 +15,6 @@ final class WebhookType extends AbstractType
     {
         $builder
             ->add('url', UrlType::class)
-            ->add('token', TextType::class, [
-                'required' => false,
-            ])
-            ->add('save', SubmitType::class)
-        ;
+            ->add('save', SubmitType::class);
     }
 }

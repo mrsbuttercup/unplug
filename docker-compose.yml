@@ -1,27 +1,26 @@
 version: '3.7'
 
 services:
-  nginx:
-    container_name: unplug-nginx
-    image: 'nginx:1.15-alpine'
+  app:
+    container_name: unplug-bot-app
+    image: nginx:1.17.9-alpine
     restart: unless-stopped
     ports:
-      - '8000:80'
+      - 30081:80
     volumes:
-      - '.:/app:delegated'
-      - './etc/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro'
+      - .:/app:delegated
+      - ./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./var/log/nginx:/var/log/nginx
     depends_on:
       - php
 
   php:
-    container_name: unplug-php
+    container_name: unplug-bot-php
     build:
       context: .
       dockerfile: ./etc/php/Dockerfile
     restart: unless-stopped
     ports:
-      - '9000:9001'
+      - 9000:9001
     volumes:
-      - '.:/app:delegated'
-    env_file:
-      - .env
+      - .:/app:delegated

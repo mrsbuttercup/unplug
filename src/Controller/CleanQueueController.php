@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Service\Telegram\Bot;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-final class HomepageController extends AbstractController
+final class CleanQueueController extends AbstractController
 {
     private Bot $bot;
 
@@ -18,10 +18,8 @@ final class HomepageController extends AbstractController
 
     public function __invoke()
     {
-        $me = $this->bot->getMe();
+        $this->bot->cleanPendingUpdates();
 
-        return $this->render('homepage.html.twig', [
-            'me' => $me,
-        ]);
+        return $this->redirectToRoute('homepage');
     }
 }

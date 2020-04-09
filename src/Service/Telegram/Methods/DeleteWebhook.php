@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Telegram\Methods;
 
-final class GetMe extends TelegramMethods implements \JsonSerializable
+final class DeleteWebhook extends TelegramMethods implements \JsonSerializable
 {
     private const METHOD = 'GET';
 

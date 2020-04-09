@@ -6,32 +6,44 @@ namespace App\Service\Telegram;
 
 use App\Service\Telegram\Methods\TelegramMethods;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TelegramAPI
 {
     private HttpClientInterface $httpClient;
-    private string $telegramToken;
+    private string $baseUrl;
 
-    public function __construct(HttpClientInterface $httpClient, string $telegramToken)
+    public function __construct(HttpClientInterface $httpClient, string $baseUrl)
     {
-        $this->httpClient    = $httpClient;
-        $this->telegramToken = $telegramToken;
+        $this->httpClient = $httpClient;
+        $this->baseUrl    = $baseUrl;
     }
 
-    public function makeRequest(TelegramMethods $method): ResponseInterface
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function makeRequest(TelegramMethods $method)
     {
         $body = \json_encode($method);
 
-        return $this->httpClient->request(
-            'POST',
-            '/bot'.$this->telegramToken.'/'.$method->getUri(),
+        $response = $this->httpClient->request(
+            $method->getMethod(),
+            $this->baseUrl . '/' . $method->getUri(),
             [
                 'headers' => [
                     'Content-Length' => strlen($body),
+                    'Content-Type'   => 'application/json',
                 ],
-                'json'    => $body,
+                'body'    => $body,
             ]
         );
+
+        if ($response->getStatusCode() === 200) {
+            return \json_decode($response->getContent(), true);
+        }
+
+        throw new \DomainException($response->getContent());
     }
 }

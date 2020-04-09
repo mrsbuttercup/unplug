@@ -6,13 +6,20 @@ namespace App\Service\Telegram\Methods;
 
 final class GetChatMember extends TelegramMethods implements \JsonSerializable
 {
-    public string $chatId;
-    public int $userId;
+    private const METHOD = 'POST';
 
-    public function __construct(string $chatId, int $userId)
+    public string $chatId;
+    public string $userId;
+
+    public function __construct(string $chatId, string $userId)
     {
         $this->chatId = $chatId;
         $this->userId = $userId;
+    }
+
+    public function getMethod(): string
+    {
+        return self::METHOD;
     }
 
     public function jsonSerialize()

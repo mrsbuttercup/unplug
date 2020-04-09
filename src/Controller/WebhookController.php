@@ -28,27 +28,17 @@ final class WebhookController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $url  = null;
 
-            try {
-                $webhookInfo = $this->bot->setWebhook($data['url']);
-                $url         = $webhookInfo->url;
-            } catch (\Throwable $throwable) {
-
-            }
-
-        } else {
-            try {
-                $webhookInfo = $this->bot->getWebhookInfo();
-                $url         = $webhookInfo->url;
-            } catch (\Throwable $throwable) {
-                $url = $this->generateUrl('update', [], UrlGeneratorInterface::ABSOLUTE_URL);;
-            }
+            $this->bot->setWebhook($data['url']);
         }
 
-        return $this->render('Webhook/index.html.twig', [
-            'url'  => $url,
-            'form' => $form->createView(),
+        $me          = $this->bot->getMe();
+        $webhookInfo = $this->bot->getWebhookInfo();
+
+        return $this->render('webhook.html.twig', [
+            'me'      => $me,
+            'webhook' => $webhookInfo,
+            'form'    => $form->createView(),
         ]);
     }
 }

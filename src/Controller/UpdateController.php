@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\Telegram\Bot;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class UpdateController
+final class UpdateController extends AbstractController
 {
     private Bot $bot;
 
@@ -17,10 +18,12 @@ final class UpdateController
         $this->bot = $bot;
     }
 
-    public function __invoke(Request $request): ResponseInterface
+    public function __invoke(Request $request): JsonResponse
     {
-        $input = json_decode($request->getContent(), true);
+        $input = \json_decode($request->getContent(), true);
 
-        $this->bot->answer($input);
+        $message = $this->bot->sendAnswer($input);
+
+        return $this->json(['ok' => true, 'result' => $message]);
     }
 }

@@ -1,10 +1,10 @@
-.PHONY: all build deps composer-install composer-update composer reload test run-tests start stop destroy doco rebuild
+.SILENT:
+.PHONY: build deps composer composer-install composer-update reload test run-tests doco start stop destroy build-images develop production rebuild
 
-current-dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+current-dir := ${CURDIR}
 
 # Main targets
 build: deps start
-
 deps: composer-install
 
 # Composer
@@ -26,27 +26,37 @@ composer composer-install composer-update:
 # Nginx: Reloads the server
 reload:
 	@docker-compose exec php kill -USR2 1
-	@docker-compose exec nginx nginx -s reload
+	@docker-compose exec app nginx -s reload
 
 # Tests
 test:
-	@docker exec unplug-php make run-tests
+	@docker-compose exec -T php make run-tests
 
 run-tests:
 	mkdir -p build/test_results/phpunit
-	./vendor/bin/phpunit --exclude-group='disabled' --colors=always --log-junit build/test_results/phpunit/junit.xml tests
+	./vendor/bin/phpunit --exclude-group='disabled' --log-junit build/test_results/phpunit/junit.xml tests
 
 # Docker Compose
-start: CMD=up -d
+start: CMD=up --detach --remove-orphans
 stop: CMD=stop
 destroy: CMD=down
+build-images: CMD=build --pull --force-rm --no-cache
 
 # Usage: `make doco CMD="ps --services"`
 # Usage: `make doco CMD="build --parallel --pull --force-rm --no-cache"`
-doco start stop destroy:
+doco start stop destroy build-images:
 	@docker-compose $(CMD)
 
 rebuild:
-	@docker-compose build --pull --force-rm --no-cache
-	make deps
+	make build-images
 	make start
+
+
+# Environments
+develop:
+	@docker-compose --file docker-compose.yml up --detach --remove-orphans
+
+production:
+	make deps
+	@docker-compose --file docker-compose.yml --file docker-compose.prod.yml up --detach --remove-orphans
+	@docker-compose exec php bin/console secrets:decrypt-to-local --force --env=prod

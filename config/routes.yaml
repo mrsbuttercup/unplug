@@ -8,6 +8,10 @@ webhook:
     controller: App\Controller\WebhookController
     methods: [GET]
 
+webhook_clean_queue:
+    path: /webhook/clean_queue
+    controller: App\Controller\CleanQueueController
+
 update:
     path: /update
     controller: App\Controller\UpdateController

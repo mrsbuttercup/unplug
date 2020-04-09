@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Service\Telegram;
 
+use App\Service\Telegram\Methods\DeleteWebhook;
 use App\Service\Telegram\Methods\GetChatMembersCount;
 use App\Service\Telegram\Methods\GetMe;
+use App\Service\Telegram\Methods\GetUpdates;
 use App\Service\Telegram\Methods\GetWebhookInfo;
 use App\Service\Telegram\Methods\SendMessage;
 use App\Service\Telegram\Methods\SetWebhook;
-use App\Service\Telegram\Methods\TelegramMethods;
 use App\Service\Telegram\Types\Message;
 use App\Service\Telegram\Types\Update;
 use App\Service\Telegram\Types\User;
 use App\Service\Telegram\Types\WebhookInfo;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 use Twig\Environment as Twig;
 
 final class Bot
@@ -33,27 +33,25 @@ final class Bot
         $getMe = new GetMe();
 
         $response = $this->telegramAPI->makeRequest($getMe);
-        $json     = \json_decode($response->getContent(), true);
-
-        if (!isset($json['ok']) || (isset($json['ok']) && $json['ok'] !== true)) {
+        if (!isset($response['ok']) || (isset($response['ok']) && $response['ok'] !== true)) {
             return null;
         }
 
-        return new User($json['result']);
+        return new User($response['result']);
     }
 
-    public function setWebhook(string $url): ?WebhookInfo
+    public function setWebhook(string $url): void
     {
         $method = new SetWebhook($url);
 
-        $response = $this->telegramAPI->makeRequest($method);
-        $json     = \json_decode($response->getContent(), true);
+        $this->telegramAPI->makeRequest($method);
+    }
 
-        if (!isset($json['ok']) || (isset($json['ok']) && $json['ok'] !== true)) {
-            return null;
-        }
+    public function removeWebhook(): void
+    {
+        $method = new DeleteWebhook();
 
-        return $this->getWebhookInfo();
+        $this->telegramAPI->makeRequest($method);
     }
 
     public function getWebhookInfo(): WebhookInfo
@@ -61,21 +59,83 @@ final class Bot
         $method = new GetWebhookInfo;
 
         $response = $this->telegramAPI->makeRequest($method);
-        $json     = \json_decode($response->getContent(), true);
-
-        if (!isset($json['ok']) || (isset($json['ok']) && $json['ok'] !== true)) {
+        if (!isset($response['ok']) || (isset($response['ok']) && $response['ok'] !== true)) {
             return null;
         }
 
-        return new WebhookInfo($json['result']);
+        return new WebhookInfo($response['result']);
     }
 
-    public function request(TelegramMethods $method): ResponseInterface
+    /**
+     * @see https://core.telegram.org/bots/api#getupdates
+     */
+    public function cleanPendingUpdates(int $maxAttempts = 3): void
     {
-        return $this->telegramAPI->makeRequest($method);
+        try {
+            $webhookInfo = $this->getWebhookInfo();
+            $attemptsCounter = 0;
+
+            $currentWebhookUrl = $webhookInfo->url;
+
+            // we need to disable webhook url before getting updates...
+            $this->removeWebhook();
+
+            while ($webhookInfo->pendingUpdateCount > 0 && $attemptsCounter < $maxAttempts) {
+                $lastUpdate = $this->getLastUpdate();
+                if ($lastUpdate) {
+                    $biggerOffset = $lastUpdate->updateId + 1;
+
+                    $this->telegramAPI->makeRequest(new GetUpdates(1, $biggerOffset));
+                }
+
+                $webhookInfo = $this->getWebhookInfo();
+
+                $maxAttempts++;
+            }
+
+            // Restore webhook url
+            $this->setWebhook($currentWebhookUrl);
+
+        } catch (\Exception $exception) {
+            dump($exception);
+            exit;
+        }
     }
 
-    public function answer(array $update): Message
+    public function getUpdates(): array
+    {
+        $method = new GetUpdates();
+        $response = $this->telegramAPI->makeRequest($method);
+        if (!isset($response['ok']) || (isset($response['ok']) && $response['ok'] !== true)) {
+            return null;
+        }
+
+        $updates = $response['result'];
+
+        return array_map(function ($update) {
+            return new Update($update);
+        }, $updates);
+    }
+
+    public function getLastUpdate(): ?Update
+    {
+        $method = new GetUpdates(1);
+        $response = $this->telegramAPI->makeRequest($method);
+        if (!isset($response['ok']) || (isset($response['ok']) && $response['ok'] !== true)) {
+            return null;
+        }
+
+        $updates = $response['result'];
+        if (!count($updates)) {
+            return null;
+        }
+
+        [$lastUpdate] = $updates;
+
+        return new Update($lastUpdate);
+    }
+
+    public function sendAnswer(array $update): ?Message
     {
         $update = new Update($update);
         if (!$this->isValid($update)) {
@@ -85,29 +145,36 @@ final class Bot
         $message = $update->editedMessage ?? $update->message;
         $chat    = $message->chat;
 
-        $chatCountRequest = $this->telegramAPI->makeRequest(new GetChatMembersCount($chat->id));
-        $totalMembers = \json_decode($chatCountRequest->getContent());
+        $response = $this->telegramAPI->makeRequest(new GetChatMembersCount($chat->id));
+        if (!isset($response['ok']) || (isset($response['ok']) && $response['ok'] !== true)) {
+            return null;
+        }
 
-        $text = $this->twig->render('Update/infamous_hideous_list.html.twig', [
+        $totalMembers = $response['result'];
+
+        $text = $this->twig->render('infamous_hideous_list.html.twig', [
             'members'         => $totalMembers,
-            'members_on_line' => mt_rand($totalMembers, $totalMembers * time()),
+            'members_on_line' => \mt_rand($totalMembers, $totalMembers * time()),
         ]);
 
         $answer = new SendMessage($chat->id, $message->messageId, $text);
 
         $response = $this->telegramAPI->makeRequest($answer);
+        if (!isset($response['ok']) || (isset($response['ok']) && $response['ok'] !== true)) {
+            return null;
+        }
 
-        return new Message(\json_decode($response, true));
+        return new Message($response['result']);
     }
 
     private function isValid(Update $update): bool
     {
         $message = $update->editedMessage ?? $update->message;
-        if (!in_array($message->chat->type, array('group', 'supergroup'), true)) {
+        if (!\in_array($message->chat->type, array('group', 'supergroup'), true)) {
             return false;
         }
 
-        if (!preg_match('/^[1-9]\d* mensaje+s{0,1}/', $message->text, $matches)) {
+        if (!\preg_match('/^[0-9]\d* mensaje+s{0,1}$/', $message->text, $matches)) {
             return false;
         }
 
