@@ -9,10 +9,11 @@ deps: composer-install
 
 # Composer
 composer-install: CMD=install
+composer-install-prod: CMD=install --quiet --no-dev
 composer-update: CMD=update
 
 # Usage example (add a new dependency): `make composer CMD="require --dev symfony/var-dumper ^4.2"`
-composer composer-install composer-update:
+composer composer-install composer-install-prod composer-update:
 	@docker run --rm --interactive --user $(id -u):$(id -g) \
 		--volume $(current-dir):/app \
 		--volume ${COMPOSER_HOME:-$HOME/.composer}:/tmp \
@@ -39,7 +40,7 @@ run-tests:
 # Docker Compose
 start: CMD=up --detach --remove-orphans
 stop: CMD=stop
-destroy: CMD=down
+destroy: CMD=down --remove-orphans
 build-images: CMD=build --pull --force-rm --no-cache
 
 # Usage: `make doco CMD="ps --services"`
@@ -57,6 +58,8 @@ develop:
 	@docker-compose --file docker-compose.yml up --detach --remove-orphans
 
 production:
-	make deps
-	@docker-compose --file docker-compose.yml --file docker-compose.prod.yml up --detach --remove-orphans
-	@docker-compose exec php bin/console secrets:decrypt-to-local --force --env=prod
+	@docker-compose down --remove-orphans > /dev/null 2>&1
+	git pull --quiet > /dev/null 2>&1
+	make composer-install-prod > /dev/null 2>&1
+	@docker-compose --file docker-compose.yml --file docker-compose.prod.yml up --detach --remove-orphans --force-recreate --quiet-pull > /dev/null 2>&1
+	@docker-compose exec -T php bin/console secrets:decrypt-to-local --force --env=prod --quiet > /dev/null 2>&1
