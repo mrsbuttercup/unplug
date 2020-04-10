@@ -1,0 +1,21 @@
+{
+  "update_id": 123,
+  "message": {
+    "message_id": 123456,
+    "from": {
+      "id": 123,
+      "is_bot": false,
+      "first_name": "John",
+      "last_name": "Doe",
+      "username": "john"
+    },
+    "chat": {
+      "id": 123,
+      "title": "Group Name",
+      "type": "group",
+      "all_members_are_administrators": true
+    },
+    "date": 1586117759,
+    "text": "01234 mensajes"
+  }
+}

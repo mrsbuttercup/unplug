@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div>
+        <pre>/getMe: {{ me | json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES')) }}</pre>
+        <pre>/getWebhookInfo: {{ webhook | json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES')) }}</pre>
+
+        <h2>Change endpoint</h2>
+
+        {{ form_start(form) }}
+            <div class="ui form">
+                <div class="inline fields">
+                    <div class="twelve wide field">
+                        <div class="ui labeled input">
+                            <div class="ui label">
+                                http://
+                            </div>
+                            {{ form_widget(form.url, {attr: {placeholder: url('update'), value: webhook.url}}) }}
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        {{ form_widget(form.save, {attr: {class: 'ui primary button'}}) }}
+                    </div>
+                </div>
+            </div>
+        {{ form_end(form) }}
+
+        {% if webhook.pendingUpdateCount > 1 %}
+            <h2>Pending updates</h2>
+
+            <a href="{{ path('webhook_clean_queue') }}">
+                Clear pending messages from queue: <strong>{{ webhook.pendingUpdateCount }}</strong>
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}
