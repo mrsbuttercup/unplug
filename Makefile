@@ -59,7 +59,7 @@ develop:
 
 production:
 	@docker-compose down --remove-orphans > /dev/null 2>&1
-	git pull --quiet > /dev/null 2>&1
+	git pull origin master --quiet > /dev/null 2>&1
 	make composer-install-prod > /dev/null 2>&1
 	@docker-compose --file docker-compose.yml --file docker-compose.prod.yml up --detach --remove-orphans --force-recreate --quiet-pull > /dev/null 2>&1
 	@docker-compose exec -T php bin/console secrets:decrypt-to-local --force --env=prod --quiet > /dev/null 2>&1
