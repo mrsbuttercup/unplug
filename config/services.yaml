@@ -1,0 +1,32 @@
+parameters:
+  telegram_api_base_url: '%env(string:TELEGRAM_BASE_URI)%%env(string:TELEGRAM_TOKEN)%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  App\:
+    resource: '../src/*'
+    exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+  App\Controller\:
+    resource: '../src/Controller'
+    tags: ['controller.service_arguments']
+
+  telegram_api.http_client:
+    class: Closure
+    factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+    arguments:
+      - headers:
+          'User-Agent': '%env(string:USER_AGENT)%'
+
+  App\Service\Telegram\TelegramAPI:
+    class: App\Service\Telegram\TelegramAPI
+    arguments:
+      - "@telegram_api.http_client"
+      - "%telegram_api_base_url%"
+
+  App\Service\Telegram\Bot:
+    class: App\Service\Telegram\Bot
+    public: true

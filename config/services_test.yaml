@@ -1,0 +1,10 @@
+parameters:
+  telegram_api_base_url: '%env(string:TELEGRAM_BASE_URI)%'
+
+services:
+  telegram_api.http_client:
+    class: Closure
+    factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+    arguments:
+      - headers:
+          x-api-key: '%env(string:POSTMAN_API_KEY)%'

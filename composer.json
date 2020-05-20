@@ -1,55 +1,97 @@
 {
-  "name": "mrsbuttercup/unplug",
-  "description": "Unplug stuff",
-  "keywords": [
-    "Telegram",
-    "Telegram Bot",
-    "Unplug"
-  ],
-  "type": "project",
-  "authors": [
-    {
-      "name": "Mary De Nóbrega",
-      "email": "denobrega.mary@gmail.com",
-      "homepage": "https://marydenobrega.com",
-      "role": "Developer"
-    }
-  ],
-  "autoload": {
-    "psr-4": {
-      "TelegramBot\\": "src/"
-    },
-    "classmap": [
-      "src/"
-    ]
-  },
-  "require": {
-    "php": ">=7.1",
-    "ext-json": "*",
-    "unreal4u/telegram-api": "~3.4",
-    "incenteev/composer-parameter-handler": "^2.1",
-    "symfony/yaml": "^3.3",
-    "twig/twig": "^2.0"
-  },
-  "config": {
-    "apcu-autoloader": true,
-    "optimize-autoloader": true,
-    "platform": {
-      "php": "7.1"
-    },
-    "process-timeout": 600
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+    "name": "mrsbuttercup/unplug",
+    "description": "Unplug stuff",
+    "keywords": [
+        "Telegram",
+        "Telegram Bot",
+        "Unplug"
     ],
-    "post-update-cmd": [
-      "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
-    ]
-  },
-  "extra": {
-    "incenteev-parameters": {
-      "file": "app/config/parameters.yml"
+    "type": "project",
+    "authors": [
+        {
+            "name": "Mary De Nóbrega",
+            "email": "denobrega.mary@gmail.com",
+            "homepage": "https://marydenobrega.com",
+            "role": "Developer"
+        }
+    ],
+    "license": "proprietary",
+    "require": {
+        "php": "^7.4.2",
+
+        "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-http": "*",
+        "ext-iconv": "*",
+        "ext-json": "*",
+
+        "doctrine/inflector": "^1.3",
+        "sentry/sentry-symfony": "^3.4",
+        "symfony/console": "5.0.*",
+        "symfony/dotenv": "5.0.*",
+        "symfony/flex": "^1.3.1",
+        "symfony/form": "5.0.*",
+        "symfony/framework-bundle": "5.0.*",
+        "symfony/http-client": "5.0.*",
+        "symfony/twig-pack": "^1.0",
+        "symfony/yaml": "5.0.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0",
+        "symfony/browser-kit": "5.0.*",
+        "symfony/css-selector": "5.0.*",
+        "symfony/test-pack": "^1.0"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "apcu-autoloader": true,
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "7.4.2"
+        },
+        "process-timeout": 600
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "paragonie/random_compat": "2.*",
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php71": "*",
+        "symfony/polyfill-php70": "*",
+        "symfony/polyfill-php56": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "require": "5.0.*"
+        }
     }
-  }
 }
